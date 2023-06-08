@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>form</title>
+    <style>
+
+      body{
+       
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-content: center;
+           
+        }
+         h1{
+            color: orange;
+            text-align: center;
+         }
+        #maindiv{
+            width: 500px;
+            border: 2px solid orange;
+            background-color: white;
+        }
+        label{
+            padding: 5px;
+        }
+        input{
+            margin: 5px;
+        }
+        .area{
+           width: 480px;
+
+        }
+        #output{
+            
+            font-size: 20px;
+        }
+
+    </style>
+</head>
+<body >
+
+   
+
+    <div id="maindiv">
+        <h1>Book A Call</h1>
+        <form action="#" onsubmit="onsignup(event)">
+            <div>
+            <label for="username">Name</label> <br>
+            <input type="text" name="username" id="username" class="area">
+            </div><br>
+            <div>
+                <label for="email">Email Address</label><br>
+                <input type="email" name="email" id="email" class="area">    
+            </div><br>
+
+            <div>
+                <label for="phone">Phone Number</label><br>
+                <input type="number" name="phone" id="ph" class="area">
+            </div><br>
+            <div>
+                <label >Time for Call</label><br>
+                <input type="date" name="date" id="dt" placeholder="23-09-2023" >
+                <input type="time" name="time" id="tm" placeholder="20:24">
+            </div><br>
+
+            <div>
+                <button type="submit" class="area">Get a Call</button>
+            </div><br>
+            <div>
+           <ul id="listOfItem"></ul>
+            </div>
+        </form>
+ 
+    </div>
+    
+    
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.4.0/axios.min.js"></script>
+
+    <script> 
+    function onsignup(event) {
+    event.preventDefault();
+
+    // Get form input values
+    const username = document.getElementById("username").value;
+    const email = document.getElementById("email").value;
+    const phone = document.getElementById("ph").value;
+    const date = document.getElementById("dt").value;
+    const time = document.getElementById("tm").value;
+
+    // Create an object to hold the input values
+    const userDetails = {
+      username: username,
+      email: email,
+      phone: phone,
+      date: date,
+      time: time,
+    };
+
+    // Store the object in local storage
+    // let allUser=JSON.parse(localStorage.getItem("allUser")) || []
+    // allUser.push(userDetails);
+    // localStorage.setItem("allUser", JSON.stringify(allUser));
+    
+    axios.post("https://crudcrud.com/api/28fca8a2c87341bb822490cc8256607c/app",userDetails)
+    .then((response)=>{
+      console.log(response);
+    })
+    .catch((err)=>{
+      console.log(err);
+    })
+  
+
+    // Reset the form
+    document.getElementById("username").value = "";
+    document.getElementById("email").value = "";
+    document.getElementById("ph").value = "";
+    document.getElementById("dt").value = "";
+    document.getElementById("tm").value = "";
+    
+    function display() {
+        // Retrieve data from the crudcrud API
+        axios
+            .get("https://crudcrud.com/api/28fca8a2c87341bb822490cc8256607c/app")
+            .then((response) => {
+                const data = response.data;
+
+                // Clear existing list items
+                const listOfItems = document.getElementById("listOfItem");
+                listOfItems.innerHTML = "";
+
+                // Loop through the retrieved data and create list items
+                data.forEach((item) => {
+                    let delbtn = document.createElement("input");
+                    delbtn.style.backgroundColor = "red";
+                    delbtn.style.color = "white";
+                    delbtn.type = "button";
+                    delbtn.value = "delete";
+
+                    let editbtn = document.createElement("input");
+                    editbtn.style.backgroundColor = "green";
+                    editbtn.style.color = "white";
+                    editbtn.type = "button";
+                    editbtn.value = "edit";
+
+                    let child = document.createElement("li");
+                    child.textContent = `${item.username}   ${item.email}  ${item.phone}  ${item.date}  ${item.time}`;
+                    listOfItems.appendChild(child);
+                    child.appendChild(delbtn);
+                    child.appendChild(editbtn);
+
+                    // Add event listeners to delete and edit buttons
+                    delbtn.addEventListener("click", function () {
+                        // Code to delete the item from the crudcrud API
+                        axios
+                            .delete(`https://crudcrud.com/api/28fca8a2c87341bb822490cc8256607c/app/${item._id}`)
+                            .then((response) => {
+                                console.log(response);
+                                listOfItems.removeChild(child);
+                            })
+                            .catch((error) => {
+                                console.log(error);
+                            });
+                    });
+
+                    editbtn.addEventListener("click", function () {
+                        // Code to populate the form with the item's data for editing
+                        document.getElementById("username").value = item.username;
+                        document.getElementById("email").value = item.email;
+                        document.getElementById("ph").value = item.phone;
+                        document.getElementById("dt").value = item.date;
+                        document.getElementById("tm").value = item.time;
+                    });
+                });
+            })
+            .catch((error) => {
+                console.log(error);
+            });
+    }
+
+    // Call the display function initially to load existing data
+    display();
+
+    }
+    
+
+
+
+
+ </script>
+        
+
+</body>
+</html>
+
